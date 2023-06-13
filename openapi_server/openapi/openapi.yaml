@@ -1,0 +1,200 @@
+openapi: 3.0.3
+info:
+  contact:
+    email: yuma140902@gmail.com
+    name: 62104247 岡村悠真
+  description: 情報工学実験1A 実世界センシングで作成した半自動センサー校正器「コウセイくん☆」のWeb APIです。このWeb APIを利用することにより、Webページ、LINE、Discordなど様々なフロントエンドからコウセイくん☆を利用することができます。
+  title: 半自動センサー校正器「コウセイくん☆」Web API
+  version: 1.1.0
+servers:
+- url: /
+paths:
+  /done:
+    post:
+      description: ""
+      operationId: post_done
+      responses:
+        "200":
+          content:
+            application/json:
+              example:
+                expression: a * m + b
+                parameters:
+                - name: a
+                  value: 2.34
+                - name: b
+                  value: 1.23
+              schema:
+                $ref: '#/components/schemas/done_response'
+          description: フィッティング済みのモデルを返す
+      summary: m_iの入力を終了してフィッティングを開始する
+      x-swagger-router-controller: Default
+      x-openapi-router-controller: openapi_server.controllers.default_controller
+  /health:
+    get:
+      operationId: get_health
+      responses:
+        default:
+          description: ""
+      summary: サーバー(コウセイくん☆)が正常に動作していれば"OK"を返す
+      x-swagger-router-controller: Default
+      x-openapi-router-controller: openapi_server.controllers.default_controller
+  /m:
+    post:
+      description: ""
+      operationId: post_m
+      requestBody:
+        content:
+          application/json:
+            example:
+              index: 42
+              value: 12.345
+            schema:
+              $ref: '#/components/schemas/m_request'
+      responses:
+        "200":
+          content:
+            application/json:
+              example:
+                index: 42
+                v: 5.123
+              schema:
+                $ref: '#/components/schemas/m_response'
+          description: Successful response
+      summary: m_iを追加する
+      x-swagger-router-controller: Default
+      x-openapi-router-controller: openapi_server.controllers.default_controller
+  /model:
+    put:
+      description: ""
+      operationId: put_model
+      requestBody:
+        content:
+          application/json:
+            example:
+              expression: a*m+b
+            schema:
+              $ref: '#/components/schemas/model_request'
+      responses:
+        "200":
+          content:
+            application/json:
+              example:
+                expression: a * m + b
+                parameters:
+                - a
+                - b
+              schema:
+                $ref: '#/components/schemas/model_response'
+          description: Default error sample response
+      summary: モデル式m=f(V)を指定する
+      x-swagger-router-controller: Default
+      x-openapi-router-controller: openapi_server.controllers.default_controller
+  /start:
+    post:
+      description: ""
+      operationId: post_start
+      responses:
+        default:
+          description: Default error sample response
+      summary: 校正のための一連の処理を開始する
+      x-swagger-router-controller: Default
+      x-openapi-router-controller: openapi_server.controllers.default_controller
+components:
+  schemas:
+    model_request:
+      properties:
+        expression:
+          title: expression
+          type: string
+      required:
+      - expression
+      title: model_request
+      type: object
+    model_response:
+      example:
+        expression: expression
+        parameters:
+        - parameters
+        - parameters
+      properties:
+        expression:
+          title: expression
+          type: string
+        parameters:
+          items:
+            type: string
+          title: parameters
+          type: array
+      required:
+      - expression
+      - parameters
+      title: model_response
+      type: object
+    m_request:
+      properties:
+        index:
+          title: index
+          type: integer
+        value:
+          title: value
+          type: number
+      required:
+      - index
+      - value
+      title: m_request
+      type: object
+    m_response:
+      example:
+        v: 6.027456183070403
+        index: 0
+      properties:
+        index:
+          title: index
+          type: integer
+        v:
+          title: v
+          type: number
+      required:
+      - index
+      - v
+      title: m_response
+      type: object
+    done_response:
+      example:
+        expression: expression
+        parameters:
+        - name: name
+          value: 0.8008281904610115
+        - name: name
+          value: 0.8008281904610115
+      properties:
+        expression:
+          title: expression
+          type: string
+        parameters:
+          items:
+            $ref: '#/components/schemas/done_response_parameters_inner'
+          title: parameters
+          type: array
+      required:
+      - expression
+      - parameters
+      title: done_response
+      type: object
+    done_response_parameters_inner:
+      example:
+        name: name
+        value: 0.8008281904610115
+      properties:
+        name:
+          title: name
+          type: string
+        value:
+          title: value
+          type: number
+      required:
+      - name
+      - value
+      title: done_response_parameters_inner
+      type: object

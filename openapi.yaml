@@ -1,0 +1,158 @@
+openapi: 3.0.3
+info:
+  title: 半自動センサー校正器「コウセイくん☆」Web API
+  description: 情報工学実験1A 実世界センシングで作成した半自動センサー校正器「コウセイくん☆」のWeb APIです。このWeb APIを利用することにより、Webページ、LINE、Discordなど様々なフロントエンドからコウセイくん☆を利用することができます。
+  contact:
+    name: 62104247 岡村悠真
+    email: yuma140902@gmail.com
+  version: 1.1.0
+servers:
+- url: /
+paths:
+  /health:
+    get:
+      summary: サーバー(コウセイくん☆)が正常に動作していれば"OK"を返す
+      operationId: "get_health"
+      responses:
+        default:
+          description: ""
+      x-swagger-router-controller: Default
+  /start:
+    post:
+      summary: 校正のための一連の処理を開始する
+      description: ""
+      operationId: "post_start"
+      responses:
+        default:
+          description: Default error sample response
+      x-swagger-router-controller: Default
+  /model:
+    put:
+      summary: モデル式m=f(V)を指定する
+      description: ""
+      operationId: "put_model"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/model_request'
+            example:
+              expression: "a*m+b"
+      responses:
+        200:
+          description: Default error sample response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/model_response'
+              example:
+                expression: "a * m + b"
+                parameters:
+                - a
+                - b
+      x-swagger-router-controller: Default
+  /m:
+    post:
+      summary: m_iを追加する
+      description: ""
+      operationId: "post_m"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/m_request'
+            example:
+              index: 42
+              value: 12.345
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/m_response'
+              example:
+                index: 42
+                v: 5.123
+      x-swagger-router-controller: Default
+  /done:
+    post:
+      summary: m_iの入力を終了してフィッティングを開始する
+      description: ""
+      operationId: "post_done"
+      responses:
+        200:
+          description: フィッティング済みのモデルを返す
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/done_response'
+              example:
+                expression: "a * m + b"
+                parameters:
+                - name: a
+                  value: 2.34
+                - name: b
+                  value: 1.23
+      x-swagger-router-controller: Default
+components:
+  schemas:
+    model_request:
+      required:
+      - expression
+      type: object
+      properties:
+        expression:
+          type: string
+    model_response:
+      required:
+      - expression
+      - parameters
+      type: object
+      properties:
+        expression:
+          type: string
+        parameters:
+          type: array
+          items:
+            type: string
+    m_request:
+      required:
+      - index
+      - value
+      type: object
+      properties:
+        index:
+          type: integer
+        value:
+          type: number
+    m_response:
+      required:
+      - index
+      - v
+      type: object
+      properties:
+        index:
+          type: integer
+        v:
+          type: number
+    done_response:
+      required:
+      - expression
+      - parameters
+      type: object
+      properties:
+        expression:
+          type: string
+        parameters:
+          type: array
+          items:
+            type: object
+            required:
+            - name
+            - value
+            properties:
+              name:
+                type: string
+              value:
+                type: number
