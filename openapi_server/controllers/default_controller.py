@@ -36,7 +36,7 @@ def fitting():
     # 損失関数
     loss_func = gd.get_loss_function(f)
     # パラメータの初期値
-    initial_params = np.random.randint(-5.0, 5.0, (4,), dtype='float')
+    initial_params = 5.0 * np.random.rand(5)
 
     # 勾配降下法を適用
     params = gd.gradient_descent(vs, ms, loss_func, 0.01, initial_params, 1e-3)
