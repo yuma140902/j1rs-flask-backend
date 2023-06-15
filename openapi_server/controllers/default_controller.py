@@ -1,5 +1,6 @@
 import connexion
 import six
+import numpy as np
 from typing import Dict
 from typing import Tuple
 from typing import Union
@@ -7,19 +8,39 @@ from typing import Union
 from flask import current_app
 
 from openapi_server.models.done_response import DoneResponse  # noqa: E501
+from openapi_server.models.done_response_parameters_inner import DoneResponseParametersInner
 from openapi_server.models.m_request import MRequest  # noqa: E501
 from openapi_server.models.m_response import MResponse  # noqa: E501
 from openapi_server.models.model_request import ModelRequest  # noqa: E501
 from openapi_server.models.model_response import ModelResponse  # noqa: E501
 from openapi_server import util
 
+from . import gd
+from . import sf
+
 
 def reset():
-    ...
+    current_app.config['__kousei_expr'] = None
+    current_app.config['__kousei_m'] = []
+    current_app.config['__kousei_v'] = []
 
 
 def fitting():
-    ...
+    code = current_app.config['__kousei_expr']
+    # モデル式
+    f = sf.str_to_func(code)
+    # 目的変数
+    ms = np.array(current_app.config['__kousei_m'])
+    # 入力変数
+    vs = np.array(current_app.config['__kousei_v'])
+    # 損失関数
+    loss_func = gd.get_loss_function(f)
+    # パラメータの初期値
+    initial_params = np.random.randint(-5.0, 5.0, (4,), dtype='float')
+
+    # 勾配降下法を適用
+    params = gd.gradient_descent(vs, ms, loss_func, 0.01, initial_params, 1e-3)
+    return params
 
 
 def get_health():  # noqa: E501
@@ -43,10 +64,16 @@ def post_done():  # noqa: E501
 
     :rtype: Union[DoneResponse, Tuple[DoneResponse, int], Tuple[DoneResponse, int, Dict[str, str]]
     """
-    fitting()
+    params = fitting()
     res = DoneResponse()
     res.expression = current_app.config['__kousei_expr']
-    res.parameters = []
+    p = []
+    for i in range(len(params)):
+        drpi = DoneResponseParametersInner()
+        drpi.name = 'p[' + str(i) + ']'
+        drpi.value = params[i]
+        p.append(drpi)
+    res.parameters = p
     return res
 
 
@@ -73,6 +100,7 @@ def post_m(m_request=None):  # noqa: E501
     res = MResponse()
     res.index = index
     v = current_app.config['__th__'].get_data()[0]
+    current_app.config['__kousei_v'].append(v)
     res.v = v
 
     return res
