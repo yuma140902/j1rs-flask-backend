@@ -42,8 +42,8 @@ def fitting():
     # パラメータの初期値
     initial_params = 5.0 * np.random.rand(5)
 
-    # 勾配降下法を適用
-    params = gd.gradient_descent(vs, ms, loss_func, 0.01, initial_params, 1e-3, 5000)
+    # モーメンタム法を適用
+    params = gd.momentum(vs, ms, loss_func, initial_params, 1e-3, 0.01, 0.9, 5000)
     return params
 
 def save_html_graph(params):

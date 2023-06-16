@@ -1,6 +1,10 @@
 import numpy as np
 
 
+def list_to_str(lst):
+    return ", ".join(f'{v:.5f}' for v in lst)
+
+
 def get_loss_function(f):
     def loss_function(xs, ys, params):
         N = len(xs)
@@ -11,6 +15,7 @@ def get_loss_function(f):
     return loss_function
 
 
+# 勾配降下法
 def partial_diff(loss_function, xs, ys, h=1e-8):
     def d(i, params):
         d_params = np.zeros_like(params)
@@ -55,6 +60,50 @@ def gradient_descent(xs,
         if num_iter >= MAX_ITER:
             print("maximum num_iter")
             break
+    return params
+
+
+# モーメンタム法
+def momentum(xs, ys, 
+             loss_function, 
+             initial_params, 
+             convergence_epsillon,
+             lr=0.01, m=0.9, MAX_ITER=5000):
+    params = initial_params
+    d_loss_function = partial_diff(loss_function, xs, ys)
+    gradients = np.zeros_like(params)
+    velocity = np.zeros_like(params)
+
+    num_iter = 0
+    while True:
+        num_iter += 1
+
+        # 勾配を計算する
+        for i in range(len(gradients)):
+            gradients[i] = d_loss_function(i, params)
+
+        # モーメンタムの更新
+        for i in range(len(velocity)):
+            velocity[i] = m * velocity[i] + (1-m) * gradients[i]
+
+        # パラメータの更新
+        for i in range(len(params)):
+            params[i] = params[i] - lr * velocity
+
+        # 損失
+        loss = loss_function(xs, ys, params)
+
+        print(f'[{num_iter:4d}] loss={loss:.10f}, params={list_to_str(params)}')
+        print(f'        grad={list_to_str(gradients)}, vel={list_to_str(velocity)}')
+
+        if loss <= convergence_epsillon:
+            print(f"break because {loss} <= {convergence_epsillon}")
+            break
+
+        if num_iter >= MAX_ITER:
+            print("maximum num_iter")
+            break
+
     return params
 
 
