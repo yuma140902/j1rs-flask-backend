@@ -88,7 +88,7 @@ def momentum(xs, ys,
 
         # パラメータの更新
         for i in range(len(params)):
-            params[i] = params[i] - lr * velocity
+            params[i] = params[i] - lr * velocity[i]
 
         # 損失
         loss = loss_function(xs, ys, params)
