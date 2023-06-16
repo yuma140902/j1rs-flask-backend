@@ -7,6 +7,8 @@ from typing import Union
 
 from flask import current_app
 
+import time
+
 from openapi_server.models.done_response import DoneResponse  # noqa: E501
 from openapi_server.models.done_response_parameters_inner import DoneResponseParametersInner
 from openapi_server.models.m_request import MRequest  # noqa: E501
@@ -134,7 +136,15 @@ def post_m(m_request=None):  # noqa: E501
 
     res = MResponse()
     res.index = index
-    v = current_app.config['__th__'].get_data()[0]
+
+    th = current_app.config['__th__']
+    v = 0.0
+    for _i in range(3):
+        while not th.received:
+            time.sleep(0.1)
+        v += th.get_data()[0]
+
+    v /= 3.0
     current_app.config['__kousei_v'].append(v)
     res.v = v
 
