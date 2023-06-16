@@ -50,7 +50,7 @@ def main():
     th.setDaemon(True)
     th.start()
 
-    app = connexion.App(__name__, specification_dir='./openapi/')
+    app = connexion.App(__name__, specification_dir='./openapi/', server_args={'static_folder': '../static', 'static_url_path': '/static'})
     CORS(
         app.app,
         supports_credentials=True
