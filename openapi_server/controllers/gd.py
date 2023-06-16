@@ -25,7 +25,8 @@ def gradient_descent(xs,
                      loss_function,
                      learning_rate,
                      initial_params,
-                     convergence_epsillon):
+                     convergence_epsillon,
+                     MAX_ITER=1000):
     params = initial_params
     d_loss_function = partial_diff(loss_function, xs, ys)
     gradients = np.zeros_like(params)
@@ -51,7 +52,7 @@ def gradient_descent(xs,
             print(f"break because {loss} <= {convergence_epsillon}")
             break
 
-        if num_iter >= 1000:
+        if num_iter >= MAX_ITER:
             print("maximum num_iter")
             break
     return params
