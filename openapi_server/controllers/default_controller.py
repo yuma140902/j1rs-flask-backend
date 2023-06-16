@@ -15,9 +15,11 @@ from openapi_server.models.model_request import ModelRequest  # noqa: E501
 from openapi_server.models.model_response import ModelResponse  # noqa: E501
 from openapi_server import util
 
+import plotly.graph_objects as go
+import plotly.io as pio
+
 from . import gd
 from . import sf
-
 
 def reset():
     current_app.config['__kousei_expr'] = None
@@ -42,6 +44,38 @@ def fitting():
     params = gd.gradient_descent(vs, ms, loss_func, 0.01, initial_params, 1e-3)
     return params
 
+def save_html_graph(params):
+    code = current_app.config['__kousei_expr']
+    # モデル式
+    f = sf.str_to_func(code)
+    # 目的変数
+    ms = np.array(current_app.config['__kousei_m'])
+    # 入力変数
+    vs = np.array(current_app.config['__kousei_v'])
+    
+    plots = []
+    d = go.Scatter(x=vs, y=ms)
+    plots.append(d)
+
+    ms_fit = []
+    vs_fit = []
+    v = np.min(vs)
+    dv = (np.max(vs) - np.min(vs)) / 100.0
+    while v < np.max(vs):
+        vs_fit.append(v)
+        ms_fit.append(f(v, params))
+        v += dv
+
+    d = go.Scatter(x=vs_fit, y=ms_fit)
+    plots.append(d)
+    layout = go.Layout(
+      title=dict(text='校正結果'),
+      xaxis=dict(title='V'),
+      yaxis=dict(title='m'),
+    )
+    fig = go.Figure(data=plots, layout=layout)
+    pio.write_html(fig, '../static/out.html')
+
 
 def get_health():  # noqa: E501
     """サーバー(コウセイくん☆)が正常に動作していれば\&quot;OK\&quot;を返す
@@ -65,6 +99,7 @@ def post_done():  # noqa: E501
     :rtype: Union[DoneResponse, Tuple[DoneResponse, int], Tuple[DoneResponse, int, Dict[str, str]]
     """
     params = fitting()
+    save_html_graph(params)
     res = DoneResponse()
     res.expression = current_app.config['__kousei_expr']
     p = []
