@@ -43,7 +43,7 @@ def fitting():
     initial_params = 5.0 * np.random.rand(5)
 
     # モーメンタム法を適用
-    params = gd.momentum(vs, ms, loss_func, initial_params, 1e-3, 0.01, 0.9, 5000)
+    params = gd.momentum(vs, ms, loss_func, initial_params, 1e-3, 0.05, 0.9, 5000)
     return params
 
 def save_html_graph(params):
@@ -142,7 +142,9 @@ def post_m(m_request=None):  # noqa: E501
     for _i in range(3):
         while not th.received:
             time.sleep(0.1)
-        v += th.get_data()[0]
+        vi = th.get_data()[0]
+        v += vi
+        print(f'[sensor data] m={value} v={vi}')
 
     v /= 3.0
     current_app.config['__kousei_v'].append(v)
