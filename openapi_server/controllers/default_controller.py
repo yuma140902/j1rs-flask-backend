@@ -56,7 +56,7 @@ def save_html_graph(params):
     vs = np.array(current_app.config['__kousei_v'])
     
     plots = []
-    d = go.Scatter(x=vs, y=ms)
+    d = go.Scatter(x=vs, y=ms, mode='markers')
     plots.append(d)
 
     ms_fit = []
@@ -68,7 +68,7 @@ def save_html_graph(params):
         ms_fit.append(f(v, params))
         v += dv
 
-    d = go.Scatter(x=vs_fit, y=ms_fit)
+    d = go.Scatter(x=vs_fit, y=ms_fit, mode='lines')
     plots.append(d)
     layout = go.Layout(
       title=dict(text='校正結果'),
@@ -76,7 +76,7 @@ def save_html_graph(params):
       yaxis=dict(title='m'),
     )
     fig = go.Figure(data=plots, layout=layout)
-    pio.write_html(fig, '../static/out.html')
+    pio.write_html(fig, './static/out.html')
 
 
 def get_health():  # noqa: E501
