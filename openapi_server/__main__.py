@@ -15,7 +15,7 @@ from flask_cors import CORS
 class ReceiveThread(threading.Thread):
     def __init__(self, PORT=12345):
         threading.Thread.__init__(self)
-        self.data = 0
+        self.data = [0]
         self.kill_flag = False
         # line information
         self.HOST = "127.0.0.1"
