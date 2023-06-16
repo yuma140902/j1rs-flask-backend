@@ -9,6 +9,8 @@ import time
 import socket
 import numpy as np
 
+from flask_cors import CORS
+
 
 class ReceiveThread(threading.Thread):
     def __init__(self, PORT=12345):
@@ -49,6 +51,10 @@ def main():
     th.start()
 
     app = connexion.App(__name__, specification_dir='./openapi/')
+    CORS(
+        app.app,
+        supports_credentials=True
+    )
     app.app.json_encoder = encoder.JSONEncoder
     app.app.config['__th__'] = th
     app.add_api('openapi.yaml',
