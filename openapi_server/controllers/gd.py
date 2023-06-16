@@ -94,7 +94,7 @@ def momentum(xs, ys,
         loss = loss_function(xs, ys, params)
 
         print(f'[{num_iter:4d}] loss={loss:.10f}, params={list_to_str(params)}')
-        print(f'       grad={list_to_str(gradients)}'
+        print(f'       grad={list_to_str(gradients)}')
         print(f'       vel={list_to_str(velocity)}')
 
         if loss <= convergence_epsillon:
