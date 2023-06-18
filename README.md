@@ -1,4 +1,4 @@
-# OpenAPI generated server
+# j1rs-flask-backend
 
 ## セットアップ
 
